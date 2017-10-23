@@ -59,38 +59,13 @@ pipeline {
                 }
             }
             steps {
-                parallel (
-                    "integrationTests" : {
                         sh 'mvn -Dmaven.repo.local=/usr/share/maven/ref verify'
                         
-                    },
-                    "sonarAnalysis" : {
-                        withSonarQubeEnv('beedemo') {
-                            sh 'mvn -Dmaven.repo.local=/usr/share/maven/ref -Dsonar.scm.disabled=True -Dsonar.login=$SONAR -Dsonar.branch=$BRANCH_NAME sonar:sonar'
-                        }
-                    }, failFast: true
-                )
+                    }
             }
             
         }
-        stage('Quality Gate') {
-            agent none
-            when {
-                not {
-                    branch "maven-build-cache"
-                }
-            }
-            steps {
-                timeout(time: 4, unit: 'MINUTES') {
-                    script {
-                        def qg = waitForQualityGate()
-                        if (qg.status != 'OK') {
-                            error "Pipeline failure due to quality gate failure: ${qg.status}"
-                        }
-                    }
-                }
-            }
-        }
+        
         stage('Build & Push Docker Image') {
             environment {
                 DOCKER_TAG = "${BUILD_NUMBER}-${SHORT_COMMIT}"
