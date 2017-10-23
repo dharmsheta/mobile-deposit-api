@@ -59,11 +59,8 @@ pipeline {
                 }
             }
             steps {
-                        sh 'mvn -Dmaven.repo.local=/usr/share/maven/ref verify'
-                        
-                    }
+                        sh 'mvn -Dmaven.repo.local=/usr/share/maven/ref verify'            
             }
-            
         }
         
         stage('Build & Push Docker Image') {
